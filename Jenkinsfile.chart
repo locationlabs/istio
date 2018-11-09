@@ -1,0 +1,49 @@
+#!/usr/bin/env groovy
+
+properties([
+        disableConcurrentBuilds(),
+        parameters([
+                string(
+                        name: 'GIT_COMMIT',
+                        description: 'The git commit hash/tag/branch/ref to use',
+                ),
+                string(
+                        name: 'CHART_PATH',
+                        description: 'the path to your chart source'
+                ),
+                string(
+                        name: 'HELM_TAG',
+                        description: 'the tag of the helm docker image to use',
+                        defaultValue: 'latest'
+                ),
+        ]),
+])
+
+node('plain-docker') {
+    catchError {
+        stage('Check out') {
+            deleteDir()
+            checkout(scm)
+        }
+        stage('Run Helm') {
+            dir("${CHART_PATH}") {
+
+                def chart_name = params.CHART_PATH.split('/').last()
+                def dockerArgs = [
+                        '--rm',
+                        "-v \$(pwd):/${chart_name}",
+                        "-e CHART_PATH=/${chart_name}"
+                ]
+                def image = "registry.tools.llabs.io/locationlabs/helm:${HELM_TAG}"
+                sh "docker pull ${image}"
+                sh "docker run ${dockerArgs.join(' ')} ${image}"
+            }
+        }
+    }
+
+    step([$class: 'Mailer',
+          notifyEveryUnstableBuild: true,
+          recipients: 'chris.phillips@locationlabs.com',
+          sendToIndividuals: true])
+}
+
