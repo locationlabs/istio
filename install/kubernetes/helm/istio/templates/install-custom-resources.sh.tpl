@@ -8,7 +8,9 @@ if [ "$#" -ne "1" ]; then
     exit 1
 fi
 
-pathToResourceYAML=${1}
+# LL mod: Spinnaker uses Spring evaluation
+# Ref: https://github.com/spinnaker/spinnaker/issues/2809
+pathToResourceYAML=${"${1}"}
 
 /kubectl get validatingwebhookconfiguration istio-galley 2>/dev/null
 if [ "$?" -eq 0 ]; then
@@ -28,5 +30,7 @@ if [ "$?" -eq 0 ]; then
     echo "istio-galley deployment ready for configuration validation"
 fi
 sleep 5
-/kubectl apply -f ${pathToResourceYAML}
+# LL mod: Spinnaker uses Spring evaluation
+# Ref: https://github.com/spinnaker/spinnaker/issues/2809
+/kubectl apply -f ${"${pathToResourceYAML}"}
 {{ end }}
