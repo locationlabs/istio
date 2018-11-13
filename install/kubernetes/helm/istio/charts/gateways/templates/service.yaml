@@ -6,9 +6,12 @@ kind: Service
 metadata:
   name: {{ $key }}
   namespace: {{ $spec.namespace | default $.Release.Namespace }}
+  # LL mod: add the `qoute` to $val as the template engine strips quotes from annotations
+  # that actually need quotes, e.g:
+  # # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
   annotations:
     {{- range $key, $val := $spec.serviceAnnotations }}
-    {{ $key }}: {{ $val }}
+    {{ $key }}: {{ $val | quote }}
     {{- end }}
   labels:
     chart: {{ $.Chart.Name }}-{{ $.Chart.Version | replace "+" "_" }}
