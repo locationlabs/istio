@@ -2,7 +2,12 @@
 {{- if and (ne $key "global") (ne $key "enabled") }}
 {{- if $spec.enabled }}
 apiVersion: extensions/v1beta1
+{{- if $spec.daemonset }}
+# Select whether to use a daemon set or a replica set
+kind: DaemonSet
+{{- else }}
 kind: Deployment
+{{- end }}
 metadata:
   name: {{ $key }}
   namespace: {{ $spec.namespace | default $.Release.Namespace }}
@@ -14,7 +19,10 @@ metadata:
     {{ $key }}: {{ $val }}
     {{- end }}
 spec:
+  {{- if not $spec.daemonset }}
+  # Include the number of desired replicas only if a replica set is to be created
   replicas: {{ $spec.replicaCount }}
+  {{- end }}
   template:
     metadata:
       labels:
