@@ -10,7 +10,7 @@ fi
 
 # LL mod: Spinnaker uses Spring evaluation
 # Ref: https://github.com/spinnaker/spinnaker/issues/2809
-pathToResourceYAML=${"${1}"}
+pathToResourceYAML=${1}
 
 /kubectl get validatingwebhookconfiguration istio-galley 2>/dev/null
 if [ "$?" -eq 0 ]; then
@@ -32,5 +32,5 @@ fi
 sleep 5
 # LL mod: Spinnaker uses Spring evaluation
 # Ref: https://github.com/spinnaker/spinnaker/issues/2809
-/kubectl apply -f ${"${pathToResourceYAML}"}
+/kubectl apply -f ${pathToResourceYAML}
 {{ end }}
