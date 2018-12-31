@@ -266,18 +266,21 @@ spec:
     totalSentBytes: connection.sent.bytes_total | 0
     reporter: conditional((context.reporter.kind | "inbound") == "outbound", "source", "destination")
   monitored_resource_type: '"global"'
----
-apiVersion: "config.istio.io/v1alpha2"
-kind: rule
-metadata:
-  name: stdio
-  namespace: {{ .Release.Namespace }}
-spec:
-  match: context.protocol == "http" || context.protocol == "grpc"
-  actions:
-  - handler: handler.stdio
-    instances:
-    - accesslog.logentry
+
+# LL mod: comment out this rule to stop istio-telemetry logging requests
+# Ref: https://github.com/istio/istio/issues/5998
+# ---
+# apiVersion: "config.istio.io/v1alpha2"
+# kind: rule
+# metadata:
+#   name: stdio
+#   namespace: {{ .Release.Namespace }}
+# spec:
+#   match: context.protocol == "http" || context.protocol == "grpc"
+#   actions:
+#   - handler: handler.stdio
+#     instances:
+#     - accesslog.logentry
 ---
 apiVersion: "config.istio.io/v1alpha2"
 kind: rule
